@@ -1,5 +1,6 @@
 use std::u32;
 
+/// Finds the min and max values in a vector
 fn minmax(input: &Vec<u32>) -> (u32, u32) {
     // Finding the min and max in one pass can be implemented
     //  as folding the list into a tuple of (min, max).
@@ -14,6 +15,12 @@ fn minmax(input: &Vec<u32>) -> (u32, u32) {
     input.iter().fold((u32::MAX, u32::MIN), update)
 }
 
+/// Finds the only two numbers a and b in a vector
+///  such that a is divisible by b
+/// 
+///  If multiple numbers satisfied the constraints,
+///  then it will return the minimum values for a and b
+///  which satisfy the constraint
 fn find_divisible(input: &Vec<u32>) -> (u32, u32) {
     let mut copy = input.to_vec();
     copy.sort();
@@ -30,6 +37,9 @@ fn find_divisible(input: &Vec<u32>) -> (u32, u32) {
     panic!("Could not find answer!")
 }
 
+/// Computes the checksum of a table of numbers
+///  where the checksum for each row is the maximum value - minimum value
+///  and the checksum of the table is the sum of the checksums of each row
 pub fn compute_simple_checksum(input: &Vec<Vec<u32>>) -> u32 {
     let checksum = |row| {
         let (min, max) = minmax(row);
@@ -38,6 +48,9 @@ pub fn compute_simple_checksum(input: &Vec<Vec<u32>>) -> u32 {
     input.iter().map(checksum).sum()
 }
 
+/// Computes the checksum of a table of numbers
+///  where the checksum for each row is a/b where a and b are the only numbers in the row such that a is divisible by b
+///  and the checksum of the table is the sum of the checksums of each row
 pub fn compute_complex_checksum(input: &Vec<Vec<u32>>) -> u32 {
     let checksum = |row| {
         let (bottom, top) = find_divisible(row);
