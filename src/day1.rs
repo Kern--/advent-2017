@@ -1,7 +1,7 @@
 
 /// Computes the captcha of an input slice
 /// where the captcha is defined as
-/// SUM a[i] where a[i] = a[i+1 % len(a)]
+/// SUM a[i] where a[i] = a[step(i) % len(a)]
 fn captcha<F>(numbers: &[u32], step: F) -> u32   
     where F: Fn(usize) -> usize  { 
     numbers.iter().enumerate()
@@ -10,10 +10,18 @@ fn captcha<F>(numbers: &[u32], step: F) -> u32
         .fold(0, |sum, x| sum + x)
 }
 
+
+/// Computes the captcha of an input slice
+/// where the captcha is defined as
+/// SUM a[i] where a[i] = a[i+i % len(a)]
 pub fn simple_captcha(numbers: &[u32]) -> u32 {
     captcha(numbers, |i| i + 1)
 }
 
+
+/// Computes the captcha of an input slice
+/// where the captcha is defined as
+/// SUM a[i] where a[i] = a[i+len(a)/2 % len(a)]
 pub fn complex_captcha(numbers: &[u32]) -> u32 {
     let len_numbers = numbers.len();
     captcha(numbers, |i| i + len_numbers / 2)
