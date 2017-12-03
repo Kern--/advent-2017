@@ -14,7 +14,7 @@ advent-2017
 
 Usage:
   advent-2017 captcha <variant> [<input>]
-  advent-2017 checksum [<input>]
+  advent-2017 checksum <variant> [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -59,7 +59,10 @@ fn main() {
     } else if args.cmd_checksum {
         let input = util::string_to_number_table(&args.get_input());
         if let Some(input) = input {
-            println!("{}", day2::compute_checksum(&input));
+            match args.arg_variant.unwrap() {
+                Variant::Simple => println!("{}", day2::compute_simple_checksum(&input)),
+                Variant::Complex => println!("{}", day2::compute_complex_checksum(&input))
+            }
             return;
         }
         println!("input must be a number table")
