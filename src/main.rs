@@ -4,6 +4,7 @@ extern crate docopt;
 
 pub mod day1;
 pub mod day2;
+pub mod day3;
 pub mod util;
 
 use std::io::{self, Read};
@@ -15,6 +16,7 @@ advent-2017
 Usage:
   advent-2017 captcha <variant> [<input>]
   advent-2017 checksum <variant> [<input>]
+  advent-2017 memory [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -28,7 +30,8 @@ struct Args {
     arg_input: Option<String>,
     arg_variant: Option<Variant>,
     cmd_captcha: bool,
-    cmd_checksum: bool
+    cmd_checksum: bool,
+    cmd_memory: bool,
 }
 
 impl Args {
@@ -66,5 +69,8 @@ fn main() {
             return;
         }
         println!("input must be a number table")
+    } else if args.cmd_memory {
+        let input = args.get_input().parse::<u32>().unwrap();
+        println!("{}", day3::compute_memory_steps(input));
     }
 }
