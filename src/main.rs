@@ -17,6 +17,7 @@ Usage:
   advent-2017 captcha <variant> [<input>]
   advent-2017 checksum <variant> [<input>]
   advent-2017 memory [<input>]
+  advent-2017 memory stress [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -32,6 +33,7 @@ struct Args {
     cmd_captcha: bool,
     cmd_checksum: bool,
     cmd_memory: bool,
+    cmd_stress: bool,
 }
 
 impl Args {
@@ -71,6 +73,10 @@ fn main() {
         println!("input must be a number table")
     } else if args.cmd_memory {
         let input = args.get_input().parse::<u32>().unwrap();
-        println!("{}", day3::compute_memory_steps(input));
+        if args.cmd_stress {
+            println!("{}", day3::run_stress_test(input));
+        } else {
+            println!("{}", day3::compute_memory_steps(input));
+        }
     }
 }
