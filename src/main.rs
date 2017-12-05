@@ -5,6 +5,7 @@ extern crate docopt;
 pub mod day1;
 pub mod day2;
 pub mod day3;
+pub mod day4;
 pub mod util;
 
 use std::io::{self, Read};
@@ -18,6 +19,7 @@ Usage:
   advent-2017 checksum <variant> [<input>]
   advent-2017 memory [<input>]
   advent-2017 memory stress [<input>]
+  advent-2017 passphrase [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -34,6 +36,7 @@ struct Args {
     cmd_checksum: bool,
     cmd_memory: bool,
     cmd_stress: bool,
+    cmd_passphrase: bool,
 }
 
 impl Args {
@@ -78,5 +81,9 @@ fn main() {
         } else {
             println!("{}", day3::compute_memory_steps(input));
         }
+    } else if args.cmd_passphrase {
+        let input = args.get_input();
+        let parsed_input = input.split("\n").map(|s|s.split(" ").collect::<Vec<&str>>());
+        println!("{}", day4::num_valid_passphrases(parsed_input));
     }
 }
