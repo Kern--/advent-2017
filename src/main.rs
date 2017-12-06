@@ -21,7 +21,7 @@ Usage:
   advent-2017 memory [<input>]
   advent-2017 memory stress [<input>]
   advent-2017 passphrase <variant> [<input>]
-  advent-2017 maze [<input>]
+  advent-2017 maze <variant> [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -95,7 +95,10 @@ fn main() {
     } else if args.cmd_maze {
         let input = args.get_input().split("\n").map(|s| s.parse::<i32>().ok()).collect::<Option<Vec<i32>>>();
         if let Some(mut input) = input {
-            println!("{}", day5::compute_steps_to_exit_maze(&mut input));
+            match args.arg_variant.unwrap() {
+                Variant::Simple => println!("{}", day5::compute_steps_to_exit_simple_maze(&mut input)),
+                Variant::Complex => println!("{}", day5::compute_steps_to_exit_complex_maze(&mut input)),
+            }
             return;
         }
         println!("input must be numbers separated by a new line")
