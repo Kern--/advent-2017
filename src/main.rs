@@ -6,6 +6,7 @@ pub mod day1;
 pub mod day2;
 pub mod day3;
 pub mod day4;
+pub mod day5;
 pub mod util;
 
 use std::io::{self, Read};
@@ -20,6 +21,7 @@ Usage:
   advent-2017 memory [<input>]
   advent-2017 memory stress [<input>]
   advent-2017 passphrase <variant> [<input>]
+  advent-2017 maze [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -37,6 +39,7 @@ struct Args {
     cmd_memory: bool,
     cmd_stress: bool,
     cmd_passphrase: bool,
+    cmd_maze: bool,
 }
 
 impl Args {
@@ -89,5 +92,12 @@ fn main() {
             Variant::Simple => println!("{}", day4::compute_num_valid_simple_passphrases(parsed_input)),
             Variant::Complex => println!("{}", day4::compute_num_valid_complex_passphrases(parsed_input)),
         }
+    } else if args.cmd_maze {
+        let input = args.get_input().split("\n").map(|s| s.parse::<i32>().ok()).collect::<Option<Vec<i32>>>();
+        if let Some(mut input) = input {
+            println!("{}", day5::compute_steps_to_exit_maze(&mut input));
+            return;
+        }
+        println!("input must be numbers separated by a new line")
     }
 }
