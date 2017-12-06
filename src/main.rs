@@ -19,7 +19,7 @@ Usage:
   advent-2017 checksum <variant> [<input>]
   advent-2017 memory [<input>]
   advent-2017 memory stress [<input>]
-  advent-2017 passphrase [<input>]
+  advent-2017 passphrase <variant> [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -83,7 +83,11 @@ fn main() {
         }
     } else if args.cmd_passphrase {
         let input = args.get_input();
-        let parsed_input = input.split("\n").map(|s|s.split(" ").collect::<Vec<&str>>());
-        println!("{}", day4::num_valid_passphrases(parsed_input));
+
+        let parsed_input = input.split("\n").map(|s| s.split(" "));
+        match args.arg_variant.unwrap() {
+            Variant::Simple => println!("{}", day4::compute_num_valid_simple_passphrases(parsed_input)),
+            Variant::Complex => println!("{}", day4::compute_num_valid_complex_passphrases(parsed_input)),
+        }
     }
 }
