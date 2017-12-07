@@ -7,6 +7,7 @@ pub mod day2;
 pub mod day3;
 pub mod day4;
 pub mod day5;
+pub mod day6;
 pub mod util;
 
 use std::io::{self, Read};
@@ -18,10 +19,11 @@ advent-2017
 Usage:
   advent-2017 captcha <variant> [<input>]
   advent-2017 checksum <variant> [<input>]
-  advent-2017 memory [<input>]
-  advent-2017 memory stress [<input>]
+  advent-2017 spiralmemory [<input>]
+  advent-2017 spiralmemory stress [<input>]
   advent-2017 passphrase <variant> [<input>]
   advent-2017 maze <variant> [<input>]
+  advent-2017 memory redistribute [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -36,10 +38,11 @@ struct Args {
     arg_variant: Option<Variant>,
     cmd_captcha: bool,
     cmd_checksum: bool,
-    cmd_memory: bool,
+    cmd_spiralmemory: bool,
     cmd_stress: bool,
     cmd_passphrase: bool,
     cmd_maze: bool,
+    cmd_memory: bool,
 }
 
 impl Args {
@@ -77,7 +80,7 @@ fn main() {
             return;
         }
         println!("input must be a number table")
-    } else if args.cmd_memory {
+    } else if args.cmd_spiralmemory {
         let input = args.get_input().parse::<u32>().unwrap();
         if args.cmd_stress {
             println!("{}", day3::run_stress_test(input));
@@ -102,5 +105,12 @@ fn main() {
             return;
         }
         println!("input must be numbers separated by a new line")
+    } else if args.cmd_memory {
+        let mut input = util::separated_string_to_number_slice(&args.get_input(), "\t");
+        if let Some(ref mut input) = input {
+            println!("{}", day6::detect_redistribution_loop(input));
+            return;
+        }
+        println!("input must be numbers separated by \\t");
     }
 }
