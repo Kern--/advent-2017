@@ -23,7 +23,7 @@ Usage:
   advent-2017 spiralmemory stress [<input>]
   advent-2017 passphrase <variant> [<input>]
   advent-2017 maze <variant> [<input>]
-  advent-2017 memory redistribute [<input>]
+  advent-2017 memory redistribute <variant> [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -108,7 +108,10 @@ fn main() {
     } else if args.cmd_memory {
         let mut input = util::separated_string_to_number_slice(&args.get_input(), "\t");
         if let Some(ref mut input) = input {
-            println!("{}", day6::detect_redistribution_loop(input));
+            match args.arg_variant.unwrap() {
+                Variant::Simple => println!("{}", day6::detect_simple_redistribution_loop(input)),
+                Variant::Complex => println!("{}", day6::detect_complex_redistribution_loop(input)),
+            }
             return;
         }
         println!("input must be numbers separated by \\t");

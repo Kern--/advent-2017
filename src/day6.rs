@@ -44,7 +44,7 @@ fn redistribute(memory: &mut [u32]) {
 }
 
 /// Calculates the number of redistrubtion cycles before returning to a previously-encoutered state
-pub fn detect_redistribution_loop(memory: &mut [u32]) -> usize {
+pub fn detect_simple_redistribution_loop(memory: &mut [u32]) -> usize {
     let mut cycles = 0;
     let mut previous_states = HashSet::<String>::new();
 
@@ -57,13 +57,30 @@ pub fn detect_redistribution_loop(memory: &mut [u32]) -> usize {
     cycles
 }
 
+/// Calculates the number of redistrubtion cycles between recurring states
+pub fn detect_complex_redistribution_loop(memory: &mut [u32]) -> usize {
+    // I'm being lazy - detect_simple_redistribution_loop modifies memory such that 
+    //  when it returns, memory = the first reencountered state. Running the simple 
+    //  case again gets the number of cycles between identical states. It could be 
+    //  made more efficient by keeping track of not only the state that was duplicated
+    //  but at which cycles they appeared.
+    detect_simple_redistribution_loop(memory);
+    detect_simple_redistribution_loop(memory)
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
 
     #[test]
-    fn test_detect_redistribution_loop() {
+    fn test_detect_simple_redistribution_loop() {
         let mut memory = vec![0, 2, 7, 0];
-        assert_eq!(detect_redistribution_loop(&mut memory), 5);
+        assert_eq!(detect_simple_redistribution_loop(&mut memory), 5);
+    }
+
+    #[test]
+    fn test_detect_complex_redistribution_loop() {
+        let mut memory = vec![0, 2, 7, 0];
+        assert_eq!(detect_complex_redistribution_loop(&mut memory), 4);
     }
 }
