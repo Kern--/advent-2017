@@ -10,6 +10,7 @@ pub mod day4;
 pub mod day5;
 pub mod day6;
 pub mod day7;
+pub mod day8;
 pub mod util;
 
 use std::io::{self, Read};
@@ -27,6 +28,7 @@ Usage:
   advent-2017 maze <variant> [<input>]
   advent-2017 memory redistribute <variant> [<input>]
   advent-2017 tower [<input>]
+  advent-2017 interpret [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -47,6 +49,7 @@ struct Args {
     cmd_maze: bool,
     cmd_memory: bool,
     cmd_tower: bool,
+    cmd_interpret: bool,
 }
 
 impl Args {
@@ -127,5 +130,10 @@ fn main() {
             return;
         }
         println!("Could not parse tower");
+    } else if args.cmd_interpret {
+        let input = args.get_input();
+        let mut interpreter = day8::Interpreter::from_str(&input).unwrap();
+        interpreter.execute();
+        println!("{}", interpreter.largest_value());
     }
 }
