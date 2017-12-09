@@ -134,6 +134,6 @@ fn main() {
         let input = args.get_input();
         let mut interpreter = day8::Interpreter::from_str(&input).unwrap();
         interpreter.execute();
-        println!("{}", interpreter.largest_value());
+        println!("current largest: {}, largest ever: {}", interpreter.get_current_largest_value(), interpreter.get_largest_value());
     }
 }

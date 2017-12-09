@@ -12,7 +12,8 @@ trait Condition<'a> {
 
 /// A mutation that can be made on the environment
 trait Operation<'a> {
-    fn perform(&self, &mut Environment);
+    // performs an operation on the environment and returns the modified register
+    fn perform(&self, &mut Environment) -> (&'a str, i32);
 }
 
 /// A representation of an increment of a register in the environment
@@ -24,12 +25,14 @@ struct Inc<'a> {
 }
 
 impl <'a> Operation<'a> for Inc<'a> {
-    fn perform(&self, environment: &mut Environment) {
+    fn perform(&self, environment: &mut Environment) -> (&'a str, i32) {
         if self.condition.is_satisfied(environment) {
             let current_value = *environment.get(self.register).unwrap_or(&0);
             let new_value = current_value + self.value;
             *environment.entry(String::from(self.register)).or_insert(0) = new_value;
         }
+        let entry = environment.entry(String::from(self.register)).or_insert(0);
+        (self.register, *entry)
     }
 }
 
@@ -42,12 +45,14 @@ struct Dec<'a> {
 }
 
 impl <'a> Operation<'a> for Dec<'a> {
-    fn perform(&self, environment: &mut Environment) {
+    fn perform(&self, environment: &mut Environment) -> (&'a str, i32) {
         if self.condition.is_satisfied(environment) {
             let current_value = *environment.get(self.register).unwrap_or(&0);
             let new_value = current_value - self.value;
             *environment.entry(String::from(self.register)).or_insert(0) = new_value;
         }
+        let entry = environment.entry(String::from(self.register)).or_insert(0);
+        (self.register, *entry)
     }
 }
 
@@ -139,7 +144,9 @@ impl <'a> Condition<'a> for Ne<'a> {
 /// A struct which can interpret operations and apply their results to an environment 
 pub struct Interpreter<'a> {
     operations: Vec<Box<Operation<'a> + 'a>>,
-    environment: HashMap<String, i32>
+    environment: HashMap<String, i32>,
+    // The largest value seen by the interpreter at any point during execution
+    largest_value: i32,
 }
 
 impl <'a> Interpreter<'a> {
@@ -176,20 +183,23 @@ impl <'a> Interpreter<'a> {
             None
         }
         if let Some(operations) = lines.map(|s| parse(s, &regex)).collect::<Option<Vec<Box<Operation<'a>>>>>() {
-            return Some(Interpreter {operations, environment: HashMap::new()})
+            return Some(Interpreter {operations, environment: HashMap::new(), largest_value: i32::MIN })
         }
         None
     }
 
-    // Executes the series of instructions held inside the interpreter
+    /// Executes the series of instructions held inside the interpreter
     pub fn execute(&mut self) {
         for op in &self.operations {
-            op.perform(&mut self.environment);
+            let (_, value) = op.perform(&mut self.environment);
+            if value > self.largest_value {
+                self.largest_value = value;
+            }
         }
     }
 
-    // Gets the largest value in the current environment
-    pub fn largest_value(&self) -> i32 {
+    /// Gets the largest value in the current environment
+    pub fn get_current_largest_value(&self) -> i32 {
         let mut largest = i32::MIN;
         for (_, value) in &self.environment {
             if *value > largest {
@@ -197,6 +207,11 @@ impl <'a> Interpreter<'a> {
             }
         }
         largest
+    }
+
+    /// Gets the largest value seen at any point during execution
+    pub fn get_largest_value(&self) -> i32 {
+        self.largest_value
     }
 
     #[allow(dead_code)]
