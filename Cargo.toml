@@ -7,3 +7,4 @@ authors = ["Kern <kern.walster@gmail.com>"]
 serde = "1.0"
 serde_derive = "1.0"
 docopt = "0.8.1"
+regex = "0.2"

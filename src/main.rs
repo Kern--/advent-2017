@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate serde_derive;
 extern crate docopt;
+extern crate regex;
 
 pub mod day1;
 pub mod day2;
@@ -8,6 +9,7 @@ pub mod day3;
 pub mod day4;
 pub mod day5;
 pub mod day6;
+pub mod day7;
 pub mod util;
 
 use std::io::{self, Read};
@@ -24,6 +26,7 @@ Usage:
   advent-2017 passphrase <variant> [<input>]
   advent-2017 maze <variant> [<input>]
   advent-2017 memory redistribute <variant> [<input>]
+  advent-2017 tower [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -43,6 +46,7 @@ struct Args {
     cmd_passphrase: bool,
     cmd_maze: bool,
     cmd_memory: bool,
+    cmd_tower: bool,
 }
 
 impl Args {
@@ -115,5 +119,13 @@ fn main() {
             return;
         }
         println!("input must be numbers separated by \\t");
+    } else if args.cmd_tower {
+        let input = args.get_input();
+        let tower = day7::Tower::from_str(&input);
+        if let Some(tower) = tower {
+            println!("{}", tower.base);
+            return;
+        }
+        println!("Could not parse tower");
     }
 }
