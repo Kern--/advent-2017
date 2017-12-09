@@ -122,8 +122,8 @@ fn main() {
     } else if args.cmd_tower {
         let input = args.get_input();
         let tower = day7::Tower::from_str(&input);
-        if let Some(tower) = tower {
-            println!("{}", tower.base);
+        if let Some(ref tower) = tower {
+            println!("base: {}, corrected_weigth: {}", tower.base, tower.calculate_corrected_weight());
             return;
         }
         println!("Could not parse tower");
