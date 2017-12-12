@@ -23,6 +23,14 @@ pub fn number_slice_to_string(input: &[u32]) -> String {
     input.iter().map(|num| num.to_string()).collect::<Vec<String>>().join(",")
 }
 
+/// Converts a &[u8] to the equivalent hex string
+pub fn to_hex_string(bytes: &[u8]) -> String {
+  let strs: Vec<String> = bytes.iter()
+                               .map(|b| format!("{:02X}", b))
+                               .collect();
+  strs.join("")
+}
+
 #[cfg(test)]
 mod test {
     use super::*;

@@ -12,6 +12,7 @@ pub mod day6;
 pub mod day7;
 pub mod day8;
 pub mod day9;
+pub mod day10;
 pub mod day11;
 pub mod util;
 
@@ -32,6 +33,7 @@ Usage:
   advent-2017 tower [<input>]
   advent-2017 interpret [<input>]
   advent-2017 stream [<input>]
+  advent-2017 knothash <variant> [<input>]
   advent-2017 hexgrid [<input>]
 ";
 
@@ -55,6 +57,7 @@ struct Args {
     cmd_tower: bool,
     cmd_interpret: bool,
     cmd_stream: bool,
+    cmd_knothash: bool,
     cmd_hexgrid: bool,
 }
 
@@ -149,6 +152,22 @@ fn main() {
             return;
         }
         println!("Could not parse stream");
+    } else if args.cmd_knothash {
+        let input = args.get_input();
+        match args.arg_variant.unwrap() {
+            Variant::Simple => {
+                let data = input.split(",").map(|s| s.parse::<u8>().unwrap()).collect::<Vec<u8>>();
+                let mut knot = day10::Knot::new(255);
+                knot.compute_round(&data);
+                println!("{}", knot.compute_fingerprint());
+            },
+            Variant::Complex => {
+                let data = input.into_bytes();
+                let mut knot = day10::Knot::new(255);
+                println!("{}", knot.compute_hash(&data));
+            }
+        }
+        
     } else if args.cmd_hexgrid {
         let input = args.get_input();
         let (current_distance, max_distance) = day11::compute_distance(&input);
