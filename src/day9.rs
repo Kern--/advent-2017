@@ -3,6 +3,7 @@ use std::str::Chars;
 pub struct Group {
     score: u32,
     sub_groups: Vec<Option<Group>>,
+    garbage_count: u32,
 }
 
 impl Group {
@@ -11,16 +12,17 @@ impl Group {
      {
         let score = parent_score + 1;
         let mut sub_groups = Vec::new();
+        let mut garbage_count = 0;
         while let Some(value) = consumer.consume_next() {
             match value {
                 // If we find the start of a new group, recurse and store the result as a child
                 '{' => sub_groups.push(Group::from_consumer(consumer, score)),
                 // If we find garbage, consume it
-                '<' => consumer.consume_garbage(),
+                '<' => { garbage_count += consumer.consume_garbage() },
                 // If we find an ignored character, consume the ignored data
                 '!' => consumer.consume_ignored(),
                 // If we find the end of a group, then we're done processing this group, return it
-                '}' => return Some(Group { score, sub_groups }),
+                '}' => return Some(Group { score, sub_groups, garbage_count }),
                 // If we find a comma, ignore it
                 ',' => {},
                 _ => return None
@@ -52,12 +54,25 @@ impl Group {
         }
         self.score + self.sub_groups.iter().map(compute_total).sum::<u32>()
     }
+
+    /// Computes the total amount of garbage in this group and all its sub-groups
+    pub fn compute_total_garbage(&self) -> u32 {
+        fn compute_total(group: &Option<Group>) -> u32 {
+            if let &Some(ref group) = group { 
+                group.compute_total_garbage() 
+            } else { 
+                0 
+            }
+        }
+        self.garbage_count + self.sub_groups.iter().map(compute_total).sum::<u32>()
+    }
 }
 
 /// A type which can consume portions of a stream while processing groups
 trait GroupConsumer {
     fn consume_next(&mut self) -> Option<char>;
-    fn consume_garbage(&mut self);
+    /// Consumes garbage and returns the number of garbage characters returned
+    fn consume_garbage(&mut self) -> u32;
     fn consume_ignored(&mut self);
 }
 
@@ -66,21 +81,20 @@ impl <'a> GroupConsumer for Chars<'a> {
         self.next()
     }
 
-    fn consume_garbage(&mut self) {
-        loop {
-            let value = match self.consume_next() {
-                None => return,
-                Some(value) => value
-            };
+    fn consume_garbage(&mut self) -> u32 {
+        let mut garbage_count = 0;
+        while let Some(value) = self.consume_next() {
             match value {
                 // If we find an ignore character, consume the ignored data
-                '!' => self.consume_ignored(),
+                '!' => { self.consume_ignored(); continue; },
                 // If we find the end of garbage, return
-                '>' => return,
+                '>' => return garbage_count,
                 // anything else, ignore
                 _ => {},
             }
+            garbage_count += 1;
         }
+        garbage_count
     }
 
     fn consume_ignored(&mut self) {
@@ -91,6 +105,33 @@ impl <'a> GroupConsumer for Chars<'a> {
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[test]
+    fn test_consume_garbage() {
+        // Consume garbage would normally start after the '<'
+        //  so we remove it here to simulate how it would actually be called
+
+        let mut input = ">";
+        assert_eq!(input.chars().consume_garbage(), 0);
+        
+        input = "random characters>";
+        assert_eq!(input.chars().consume_garbage(), 17);
+
+        input = "<<<>";
+        assert_eq!(input.chars().consume_garbage(), 3);
+
+        input = "{!>}>";
+        assert_eq!(input.chars().consume_garbage(), 2);
+
+        input = "!!>";
+        assert_eq!(input.chars().consume_garbage(), 0);
+
+        input = "!!!>>";
+        assert_eq!(input.chars().consume_garbage(), 0);
+
+        input = "{o\"i!a,<{i<a>";
+        assert_eq!(input.chars().consume_garbage(), 10);
+    }
 
     #[test]
     fn test_trivial_group() {
@@ -137,4 +178,5 @@ mod test {
         group = Group::from_str(input).unwrap();
         assert_eq!(group.compute_total_score(), 3);
     }
+
 }

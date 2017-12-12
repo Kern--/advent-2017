@@ -142,7 +142,7 @@ fn main() {
         let input = args.get_input();
         let group = day9::Group::from_str(&input);
         if let Some(group) = group {
-            println!("{}", group.compute_total_score());
+            println!("score: {}, garbage: {}", group.compute_total_score(), group.compute_total_garbage());
             return;
         }
         println!("Could not parse stream");
