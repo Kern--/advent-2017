@@ -11,6 +11,7 @@ pub mod day5;
 pub mod day6;
 pub mod day7;
 pub mod day8;
+pub mod day9;
 pub mod util;
 
 use std::io::{self, Read};
@@ -29,6 +30,7 @@ Usage:
   advent-2017 memory redistribute <variant> [<input>]
   advent-2017 tower [<input>]
   advent-2017 interpret [<input>]
+  advent-2017 stream [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -50,6 +52,7 @@ struct Args {
     cmd_memory: bool,
     cmd_tower: bool,
     cmd_interpret: bool,
+    cmd_stream: bool,
 }
 
 impl Args {
@@ -135,5 +138,13 @@ fn main() {
         let mut interpreter = day8::Interpreter::from_str(&input).unwrap();
         interpreter.execute();
         println!("current largest: {}, largest ever: {}", interpreter.get_current_largest_value(), interpreter.get_largest_value());
+    } else if args.cmd_stream {
+        let input = args.get_input();
+        let group = day9::Group::from_str(&input);
+        if let Some(group) = group {
+            println!("{}", group.compute_total_score());
+            return;
+        }
+        println!("Could not parse stream");
     }
 }
