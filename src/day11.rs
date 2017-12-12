@@ -147,16 +147,20 @@ mod test {
     #[test]
     fn test_distances() {
         let mut input = "ne,ne,ne";
-        assert_eq!(compute_distance(input), 3); 
+        let (distance, _) = compute_distance(input);
+        assert_eq!(distance, 3); 
 
         input = "ne,ne,sw,sw";
-        assert_eq!(compute_distance(input), 0); 
+        let (distance, _) = compute_distance(input);
+        assert_eq!(distance, 0); 
 
         input = "ne,ne,s,s";
-        assert_eq!(compute_distance(input), 2); 
+        let (distance, _) = compute_distance(input);
+        assert_eq!(distance, 2); 
 
         input = "se,sw,se,sw,sw";
-        assert_eq!(compute_distance(input), 3); 
+        let (distance, _) = compute_distance(input);
+        assert_eq!(distance, 3); 
     }
 
 }
