@@ -228,37 +228,37 @@ mod test {
     fn test_empty_environment_conditions() {
         let environment = HashMap::new();
 
-        /// EQ
+        // EQ
         let eq = Eq { register: "a", value: 1};
         assert!(!eq.is_satisfied(&environment), "a == 1 when env = {} should have failed");
         let eq = Eq { register: "a", value: 0};
         assert!(eq.is_satisfied(&environment), "a == 0 when env = {} should have passed");
 
-        /// LT
+        // LT
         let lt = Lt { register: "a", value: -1};
         assert!(!lt.is_satisfied(&environment), "a < -1 when env = {} should have failed");
         let lt = Lt { register: "a", value: 1};
         assert!(lt.is_satisfied(&environment), "a < 1 when env = {} should have passed");
 
-        /// GT
+        // GT
         let gt = Gt { register: "a", value: 1};
         assert!(!gt.is_satisfied(&environment), "a > 1 when env = {} should have failed");
         let gt = Gt { register: "a", value: -1};
         assert!(gt.is_satisfied(&environment), "a > -1 when env = {} should have passed");
 
-        /// NE
+        // NE
         let ne = Ne { register: "a", value: 0};
         assert!(!ne.is_satisfied(&environment), "a != 0 when env = {} should have failed");
         let ne = Ne { register: "a", value: 1};
         assert!(ne.is_satisfied(&environment), "a != 1 when env = {} should have passed");
 
-        /// LTE
+        // LTE
         let lte = Lte { register: "a", value: -1};
         assert!(!lte.is_satisfied(&environment), "a <= -1 when env = {} should have failed");
         let lte = Lte { register: "a", value: 0};
         assert!(lte.is_satisfied(&environment), "a <= 0 when env = {} should have passed");
 
-        /// GTE
+        // GTE
         let gte = Gte { register: "a", value: 1};
         assert!(!gte.is_satisfied(&environment), "a >= 1 when env = {} should have failed");
         let gte = Gte { register: "a", value: 0};
@@ -270,27 +270,27 @@ mod test {
         let mut environment = HashMap::new();
         environment.insert(String::from("a"), 5);
 
-        /// EQ
+        // EQ
         let eq = Eq { register: "a",  value: 5 };
         assert!(eq.is_satisfied(&environment), "a == 5 when env = {a: 5} should have passed");
 
-        /// LT
+        // LT
         let lt = Lt { register: "a",  value: 6 };
         assert!(lt.is_satisfied(&environment), "a < 6 when env = {a: 5} should have passed");
 
-        /// Gt
+        // Gt
         let gt = Gt { register: "a",  value: 4 };
         assert!(gt.is_satisfied(&environment), "a > 4 when env = {a: 5} should have passed");
 
-        /// LTE
+        // LTE
         let lte = Lte { register: "a",  value: 5 };
         assert!(lte.is_satisfied(&environment), "a <= 5 when env = {a: 5} should have passed");
 
-        /// GTE
+        // GTE
         let gte = Gte { register: "a",  value: 5 };
         assert!(gte.is_satisfied(&environment), "a >= 5 when env = {a: 5} should have passed");
 
-        /// NE
+        // NE
         let ne = Ne { register: "a",  value: 4 };
         assert!(ne.is_satisfied(&environment), "a != 4 when env = {a: 5} should have passed");
     }
@@ -302,7 +302,7 @@ mod test {
 
         let cond = Box::new(Eq { register: "a", value: 4 });
         let op = Box::new(Inc { register: "a", value: 5, condition: cond });
-        let mut interpreter = Interpreter { environment, operations: vec![op] };
+        let mut interpreter = Interpreter { environment, operations: vec![op], largest_value: i32::MIN };
         interpreter.execute();
         assert_eq!(interpreter.get_value("a"), 5);
     }
@@ -314,7 +314,7 @@ mod test {
 
         let cond = Box::new(Eq { register: "a", value: 5 });
         let op = Box::new(Inc { register: "a", value: 5, condition: cond });
-        let mut interpreter = Interpreter { environment, operations: vec![op] };
+        let mut interpreter = Interpreter { environment, operations: vec![op], largest_value: i32::MIN };
         interpreter.execute();
         assert_eq!(interpreter.get_value("a"), 10);
     }
@@ -326,7 +326,7 @@ mod test {
 
         let cond = Box::new(Eq { register: "a", value: 4 });
         let op = Box::new(Dec { register: "a", value: 5, condition: cond });
-        let mut interpreter = Interpreter { environment, operations: vec![op] };
+        let mut interpreter = Interpreter { environment, operations: vec![op], largest_value: i32::MIN };
         interpreter.execute();
         assert_eq!(interpreter.get_value("a"), 5);
     }
@@ -338,7 +338,7 @@ mod test {
 
         let cond = Box::new(Eq { register: "a", value: 5 });
         let op = Box::new(Dec { register: "a", value: 5, condition: cond });
-        let mut interpreter = Interpreter { environment, operations: vec![op] };
+        let mut interpreter = Interpreter { environment, operations: vec![op], largest_value: i32::MIN };
         interpreter.execute();
         assert_eq!(interpreter.get_value("a"), 0);
     }
@@ -348,6 +348,6 @@ mod test {
         let input = "b inc 5 if a > 1\na inc 1 if b < 5\nc dec -10 if a >= 1\nc inc -20 if c == 10";
         let mut interpreter = Interpreter::from_str(input).unwrap();
         interpreter.execute();
-        assert_eq!(interpreter.largest_value(), 1);
+        assert_eq!(interpreter.largest_value, 10);
     }
 }
