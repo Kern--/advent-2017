@@ -12,6 +12,7 @@ pub mod day6;
 pub mod day7;
 pub mod day8;
 pub mod day9;
+pub mod day11;
 pub mod util;
 
 use std::io::{self, Read};
@@ -31,6 +32,7 @@ Usage:
   advent-2017 tower [<input>]
   advent-2017 interpret [<input>]
   advent-2017 stream [<input>]
+  advent-2017 hexgrid [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -53,6 +55,7 @@ struct Args {
     cmd_tower: bool,
     cmd_interpret: bool,
     cmd_stream: bool,
+    cmd_hexgrid: bool,
 }
 
 impl Args {
@@ -146,5 +149,8 @@ fn main() {
             return;
         }
         println!("Could not parse stream");
+    } else if args.cmd_hexgrid {
+        let input = args.get_input();
+        println!("{}", day11::compute_distance(&input));
     }
 }
