@@ -151,6 +151,7 @@ fn main() {
         println!("Could not parse stream");
     } else if args.cmd_hexgrid {
         let input = args.get_input();
-        println!("{}", day11::compute_distance(&input));
+        let (current_distance, max_distance) = day11::compute_distance(&input);
+        println!("current distance: {}, max_distance: {}", current_distance, max_distance);
     }
 }

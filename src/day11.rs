@@ -50,15 +50,22 @@ fn parse_directions(path: &str) -> Option<Vec<Direction>> {
 }
 
 /// Calculates the final position after following a path containing a series of directions
-fn calculate_final_position(path: &str) -> (i64, i64) {
+/// returns (final_x, final_y), (max_x, max_y)
+fn calculate_final_position(path: &str) -> ((i64, i64), (i64, i64)) {
     let mut x = 0;
     let mut y = 0;
+    let mut max_x = 0;
+    let mut max_y = 0;
     if let Some(directions) = parse_directions(path) {
         for direction in directions {
             step(&mut x, &mut y, direction);
+            if x.abs() + y.abs() > max_x + max_y {
+                max_x = x.abs();
+                max_y = y.abs();
+            }
         }
     }
-    (x, y)
+    ((x, y), (max_x, max_y))
 }
 
 /// Calculates the new X and Y position after taking a step in the dir Direction
@@ -117,10 +124,13 @@ fn calculate_steps(start_x: i64, start_y: i64) -> u64 {
 }
 
 /// Computes the shortest distance from the final position after following path to (0, 0)
-pub fn compute_distance(path: &str) -> u64 {
-    let (final_x, final_y) = calculate_final_position(path);
+/// returns (current_distance, max_distance)
+pub fn compute_distance(path: &str) -> (u64, u64) {
+    let ((final_x, final_y), (max_x, max_y)) = calculate_final_position(path);
     println!("({}, {})", final_x, final_y);
-    calculate_steps(final_x, final_y)
+    let current_distance = calculate_steps(final_x, final_y);
+    let max_distance = calculate_steps(max_x, max_y);
+    (current_distance, max_distance)
 }
 
 #[cfg(test)]
