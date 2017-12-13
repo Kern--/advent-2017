@@ -15,6 +15,7 @@ pub mod day9;
 pub mod day10;
 pub mod day11;
 pub mod day12;
+pub mod day13;
 pub mod util;
 
 use std::io::{self, Read};
@@ -37,6 +38,7 @@ Usage:
   advent-2017 knothash <variant> [<input>]
   advent-2017 hexgrid [<input>]
   advent-2017 pipes [<input>]
+  advent-2017 firewall [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -62,6 +64,7 @@ struct Args {
     cmd_knothash: bool,
     cmd_hexgrid: bool,
     cmd_pipes: bool,
+    cmd_firewall: bool,
 }
 
 impl Args {
@@ -183,5 +186,12 @@ fn main() {
             return;
         }
         println!("Could not parse graph");
+    } else if args.cmd_firewall {
+        let input = args.get_input();
+        let firewall = day13::Firewall::from_str(&input);
+        match firewall {
+            Ok(firewall) => println!("{}", firewall.compute_severity()),
+            Err(error) => println!("{}", error)
+        }
     }
 }
