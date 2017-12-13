@@ -14,6 +14,7 @@ pub mod day8;
 pub mod day9;
 pub mod day10;
 pub mod day11;
+pub mod day12;
 pub mod util;
 
 use std::io::{self, Read};
@@ -35,6 +36,7 @@ Usage:
   advent-2017 stream [<input>]
   advent-2017 knothash <variant> [<input>]
   advent-2017 hexgrid [<input>]
+  advent-2017 pipes [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -59,6 +61,7 @@ struct Args {
     cmd_stream: bool,
     cmd_knothash: bool,
     cmd_hexgrid: bool,
+    cmd_pipes: bool,
 }
 
 impl Args {
@@ -172,5 +175,13 @@ fn main() {
         let input = args.get_input();
         let (current_distance, max_distance) = day11::compute_distance(&input);
         println!("current distance: {}, max_distance: {}", current_distance, max_distance);
+    } else if args.cmd_pipes {
+        let input = args.get_input();
+        let graph = day12::parse_graph(&input);
+        if let Some(graph) = graph {
+            println!("{}", day12::find_group(0, &graph).len());
+            return;
+        }
+        println!("Could not parse graph");
     }
 }
