@@ -179,7 +179,7 @@ fn main() {
         let input = args.get_input();
         let graph = day12::parse_graph(&input);
         if let Some(graph) = graph {
-            println!("{}", day12::find_group(0, &graph).len());
+            println!("#elements in group containing 0: {}, num groups {}", day12::find_group(0, &graph).len(), day12::find_all_groups(&graph).len());
             return;
         }
         println!("Could not parse graph");
