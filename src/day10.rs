@@ -1,5 +1,3 @@
-use util;
-
 #[derive(Debug)]
 pub struct Knot {
     data: Vec<u8>,
@@ -28,7 +26,7 @@ impl Knot {
     }
 
     /// Computes a complete knot hash based on the input of lengths
-    pub fn compute_hash(&mut self, lengths: &[u8]) -> String {
+    pub fn compute_hash(&mut self, lengths: &[u8]) -> [u8;16] {
         let mut dense_hash = [0u8;16];
         let secret = vec![17, 31, 73, 47, 23];
         for _ in 0..64 {
@@ -40,7 +38,7 @@ impl Knot {
                 dense_hash[i] ^= self.data[i*16+j];
             }
         }
-        util::to_hex_string(&dense_hash)
+        dense_hash
     }
 
     /// Computes the fingerprint of the knot
@@ -71,6 +69,7 @@ impl Knot {
 #[cfg(test)]
 mod test {
     use super::*;
+    use util;
 
     #[test]
     fn test_round() {
@@ -84,21 +83,21 @@ mod test {
     fn test_hash() {
         let mut knot = Knot::new(255);
         let mut data = Vec::new();
-        assert_eq!(knot.compute_hash(&data), "A2582A3A0E66E6E86E3812DCB672A272");
+        assert_eq!(util::to_hex_string(&knot.compute_hash(&data)), "A2582A3A0E66E6E86E3812DCB672A272");
 
         let mut input = "AoC 2017";
         knot = Knot::new(255);
         data = input.bytes().collect();
-        assert_eq!(knot.compute_hash(&data), "33EFEB34EA91902BB2F59C9920CAA6CD"); 
+        assert_eq!(util::to_hex_string(&knot.compute_hash(&data)), "33EFEB34EA91902BB2F59C9920CAA6CD"); 
 
         input = "1,2,3";
         knot = Knot::new(255);
         data = input.bytes().collect();
-        assert_eq!(knot.compute_hash(&data), "3EFBE78A8D82F29979031A4AA0B16A9D"); 
+        assert_eq!(util::to_hex_string(&knot.compute_hash(&data)), "3EFBE78A8D82F29979031A4AA0B16A9D"); 
 
         input = "1,2,4";
         knot = Knot::new(255);
         data = input.bytes().collect();
-        assert_eq!(knot.compute_hash(&data), "63960835BCDC130F0B66D7FF4F6A5A8E"); 
+        assert_eq!(util::to_hex_string(&knot.compute_hash(&data)), "63960835BCDC130F0B66D7FF4F6A5A8E"); 
     }
 }

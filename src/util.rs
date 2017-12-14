@@ -23,6 +23,15 @@ pub fn number_slice_to_string(input: &[u32]) -> String {
     input.iter().map(|num| num.to_string()).collect::<Vec<String>>().join(",")
 }
 
+/// Counts the number of bits in input which are 1
+pub fn count_bits(input: u8) -> u16 {
+    let mut count = 0;
+    for i in 0..8 {
+        count += ((input & (1u8 << i)) >> i) as u16
+    }
+    count
+}
+
 /// Converts a &[u8] to the equivalent hex string
 pub fn to_hex_string(bytes: &[u8]) -> String {
   let strs: Vec<String> = bytes.iter()
@@ -59,6 +68,21 @@ mod test {
     fn test_separated_string_to_number_slice() {
         let input: &'static str = "1\t2\t3\t4\t5";
         assert_eq!(separated_string_to_number_slice(input, "\t"), Some(vec![1,2,3,4,5]));
+    }
+
+    #[test]
+    fn test_count_bits() {
+        let mut input = 1;
+        assert_eq!(count_bits(input), 1);
+
+        input = 2;
+        assert_eq!(count_bits(input), 1);
+
+        input = 7;
+        assert_eq!(count_bits(input), 3);
+
+        input = 0xFF;
+        assert_eq!(count_bits(input), 8);
     }
 }
 

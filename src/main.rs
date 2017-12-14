@@ -16,6 +16,7 @@ pub mod day10;
 pub mod day11;
 pub mod day12;
 pub mod day13;
+pub mod day14;
 pub mod util;
 
 use std::io::{self, Read};
@@ -39,6 +40,7 @@ Usage:
   advent-2017 hexgrid [<input>]
   advent-2017 pipes [<input>]
   advent-2017 firewall [<input>]
+  advent-2017 defragment [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -65,6 +67,7 @@ struct Args {
     cmd_hexgrid: bool,
     cmd_pipes: bool,
     cmd_firewall: bool,
+    cmd_defragment: bool,
 }
 
 impl Args {
@@ -170,7 +173,7 @@ fn main() {
             Variant::Complex => {
                 let data = input.into_bytes();
                 let mut knot = day10::Knot::new(255);
-                println!("{}", knot.compute_hash(&data));
+                println!("{}", util::to_hex_string(&knot.compute_hash(&data)));
             }
         }
         
@@ -193,5 +196,8 @@ fn main() {
             Ok(firewall) => println!("severity: {}, min delay: {}", firewall.compute_severity(0), firewall.compute_min_safe_delay()),
             Err(error) => println!("{}", error)
         }
+    } else if args.cmd_defragment {
+        let input = args.get_input();
+        println!("{}", day14::count_used_squares(&input));
     }
 }
