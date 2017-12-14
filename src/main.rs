@@ -190,7 +190,7 @@ fn main() {
         let input = args.get_input();
         let firewall = day13::Firewall::from_str(&input);
         match firewall {
-            Ok(firewall) => println!("{}", firewall.compute_severity()),
+            Ok(firewall) => println!("severity: {}, min delay: {}", firewall.compute_severity(0), firewall.compute_min_safe_delay()),
             Err(error) => println!("{}", error)
         }
     }
