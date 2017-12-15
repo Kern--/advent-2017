@@ -198,6 +198,6 @@ fn main() {
         }
     } else if args.cmd_defragment {
         let input = args.get_input();
-        println!("{}", day14::count_used_squares(&input));
+        println!("used squares: {}, num groups: {}", day14::count_used_squares(&input), day14::get_groups(&input).len());
     }
 }
