@@ -17,6 +17,7 @@ pub mod day11;
 pub mod day12;
 pub mod day13;
 pub mod day14;
+pub mod day15;
 pub mod util;
 
 use std::io::{self, Read};
@@ -41,6 +42,7 @@ Usage:
   advent-2017 pipes [<input>]
   advent-2017 firewall [<input>]
   advent-2017 defragment [<input>]
+  advent-2017 generator <a> <b>
 ";
 
 #[derive(Debug, Deserialize)]
@@ -53,6 +55,8 @@ enum Variant {
 struct Args {
     arg_input: Option<String>,
     arg_variant: Option<Variant>,
+    arg_a: u64,
+    arg_b: u64,
     cmd_captcha: bool,
     cmd_checksum: bool,
     cmd_spiralmemory: bool,
@@ -68,6 +72,7 @@ struct Args {
     cmd_pipes: bool,
     cmd_firewall: bool,
     cmd_defragment: bool,
+    cmd_generator: bool,
 }
 
 impl Args {
@@ -199,5 +204,10 @@ fn main() {
     } else if args.cmd_defragment {
         let input = args.get_input();
         println!("used squares: {}, num groups: {}", day14::count_used_squares(&input), day14::get_groups(&input).len());
+    } else if args.cmd_generator {
+        let a = day15::Generator::new(16807, args.arg_a);
+        let b = day15::Generator::new(48271, args.arg_b);
+        let mut judge = day15::Judge::new(a, b);
+        println!("{}", judge.judge());
     }
 }
