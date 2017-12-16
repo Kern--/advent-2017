@@ -42,7 +42,7 @@ Usage:
   advent-2017 pipes [<input>]
   advent-2017 firewall [<input>]
   advent-2017 defragment [<input>]
-  advent-2017 generator <a> <b>
+  advent-2017 generator <a> <b> [<aalignment>] [<balignment>] [<trials>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -57,6 +57,9 @@ struct Args {
     arg_variant: Option<Variant>,
     arg_a: u64,
     arg_b: u64,
+    arg_aalignment: Option<u64>,
+    arg_balignment: Option<u64>,
+    arg_trials: Option<u32>,
     cmd_captcha: bool,
     cmd_checksum: bool,
     cmd_spiralmemory: bool,
@@ -205,9 +208,13 @@ fn main() {
         let input = args.get_input();
         println!("used squares: {}, num groups: {}", day14::count_used_squares(&input), day14::get_groups(&input).len());
     } else if args.cmd_generator {
-        let a = day15::Generator::new(16807, args.arg_a);
-        let b = day15::Generator::new(48271, args.arg_b);
+        let a = day15::Generator::new(16807, args.arg_a, args.arg_aalignment);
+        let b = day15::Generator::new(48271, args.arg_b, args.arg_balignment);
         let mut judge = day15::Judge::new(a, b);
+        if let Some(trials) = args.arg_trials {
+            println!("{}", judge.judge_trials(trials));
+            return;
+        }
         println!("{}", judge.judge());
     }
 }
