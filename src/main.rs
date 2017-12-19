@@ -2,6 +2,8 @@
 extern crate serde_derive;
 extern crate docopt;
 extern crate regex;
+#[macro_use]
+extern crate lazy_static;
 
 pub mod day1;
 pub mod day2;
@@ -18,6 +20,7 @@ pub mod day12;
 pub mod day13;
 pub mod day14;
 pub mod day15;
+pub mod day16;
 pub mod util;
 
 use std::io::{self, Read};
@@ -42,7 +45,8 @@ Usage:
   advent-2017 pipes [<input>]
   advent-2017 firewall [<input>]
   advent-2017 defragment [<input>]
-  advent-2017 generator <a> <b> [<aalignment>] [<balignment>] [<trials>]
+  advent-2017 generator <a> <b> [<aalignment>] [<balignment>] [<trials>],
+  advent-2017 dance <repetitions> [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -60,6 +64,7 @@ struct Args {
     arg_aalignment: Option<u64>,
     arg_balignment: Option<u64>,
     arg_trials: Option<u32>,
+    arg_repetitions: u32,
     cmd_captcha: bool,
     cmd_checksum: bool,
     cmd_spiralmemory: bool,
@@ -76,6 +81,7 @@ struct Args {
     cmd_firewall: bool,
     cmd_defragment: bool,
     cmd_generator: bool,
+    cmd_dance: bool,
 }
 
 impl Args {
@@ -216,5 +222,10 @@ fn main() {
             return;
         }
         println!("{}", judge.judge());
+    } else if args.cmd_dance {
+        let input = args.get_input();
+        let mut dance = day16::Dance::new();
+        dance.dance_repeatedly(&input, args.arg_repetitions);
+        println!("{}", dance);
     }
 }
