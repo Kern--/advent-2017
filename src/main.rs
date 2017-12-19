@@ -21,6 +21,7 @@ pub mod day13;
 pub mod day14;
 pub mod day15;
 pub mod day16;
+pub mod day17;
 pub mod util;
 
 use std::io::{self, Read};
@@ -47,6 +48,7 @@ Usage:
   advent-2017 defragment [<input>]
   advent-2017 generator <a> <b> [<aalignment>] [<balignment>] [<trials>],
   advent-2017 dance <repetitions> [<input>]
+  advent-2017 spinlock [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -82,6 +84,7 @@ struct Args {
     cmd_defragment: bool,
     cmd_generator: bool,
     cmd_dance: bool,
+    cmd_spinlock: bool,
 }
 
 impl Args {
@@ -227,5 +230,14 @@ fn main() {
         let mut dance = day16::Dance::new();
         dance.dance_repeatedly(&input, args.arg_repetitions);
         println!("{}", dance);
+    } else if args.cmd_spinlock {
+        let input = args.get_input().parse::<u32>();
+        match input {
+            Ok(step_size) => {
+                let mut spinlock = day17::SpinLock::new(step_size);
+                println!("{}", spinlock.short_circuit(2017));
+            },
+            Err(error) => println!("Could not parse input, {}", error)
+        }
     }
 }
