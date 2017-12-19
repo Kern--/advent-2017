@@ -235,7 +235,8 @@ fn main() {
         match input {
             Ok(step_size) => {
                 let mut spinlock = day17::SpinLock::new(step_size);
-                println!("{}", spinlock.short_circuit(2017));
+                let mut pseudospinlock = day17::PseudoSpinLock::new(step_size);
+                println!("spinlock: {}, angry spinlock: {}", spinlock.short_circuit(2017), pseudospinlock.short_circuit(50_000_000));
             },
             Err(error) => println!("Could not parse input, {}", error)
         }
