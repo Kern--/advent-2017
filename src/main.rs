@@ -257,6 +257,7 @@ fn main() {
     } else if args.cmd_route {
         let input = args.get_input();
         let diagram = day19::Diagram::parse(&input);
-        println!("{}", diagram.navigate());
+        let (result, steps) = diagram.navigate();
+        println!("result: {}, steps: {}", result, steps);
     }
 }

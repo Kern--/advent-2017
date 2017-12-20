@@ -97,10 +97,11 @@ impl Diagram {
     }
 
     /// Navigates through the diagram, returning the nodes visited in order
-    pub fn navigate(&self) -> String {
+    pub fn navigate(&self) -> (String, u32) {
         let (mut i, mut j) = self.find_start();
         let mut direction = Direction::Down;
         let mut result = String::new();
+        let mut steps = 0;
 
         // if we hit nothing, then it's impossible to continue in the current direction meaning we're done
         while self.get_element(i, j) != &PathElement::Nothing {
@@ -112,8 +113,9 @@ impl Diagram {
             if let PathElement::Letter(c) = *self.get_element(i, j) {
                 result.push(c);
             }
+            steps += 1;
         }
-        result
+        (result, steps)
     }
 }
 
@@ -131,6 +133,8 @@ pub mod test {
      +B-+  +--+ 
 "##;
         let diagram = Diagram::parse(input);
-        assert_eq!(diagram.navigate(), "ABCDEF");
+        let (result, steps) = diagram.navigate();
+        assert_eq!(result, "ABCDEF");
+        assert_eq!(steps, 38);
     }
 }
