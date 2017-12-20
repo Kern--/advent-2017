@@ -22,6 +22,7 @@ pub mod day14;
 pub mod day15;
 pub mod day16;
 pub mod day17;
+pub mod day18;
 pub mod util;
 
 use std::io::{self, Read};
@@ -49,6 +50,7 @@ Usage:
   advent-2017 generator <a> <b> [<aalignment>] [<balignment>] [<trials>],
   advent-2017 dance <repetitions> [<input>]
   advent-2017 spinlock [<input>]
+  advent-2017 duet [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -85,6 +87,7 @@ struct Args {
     cmd_generator: bool,
     cmd_dance: bool,
     cmd_spinlock: bool,
+    cmd_duet: bool,
 }
 
 impl Args {
@@ -240,5 +243,13 @@ fn main() {
             },
             Err(error) => println!("Could not parse input, {}", error)
         }
+    } else if args.cmd_duet {
+        let input = args.get_input();
+        let interpreter = day18::SoundInterpreter::new(&input);
+        if let Some(mut interpreter) = interpreter {
+            println!("{}", interpreter.execute());
+            return;
+        }
+        println!("Could not parse input");
     }
 }
