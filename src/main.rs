@@ -23,6 +23,7 @@ pub mod day15;
 pub mod day16;
 pub mod day17;
 pub mod day18;
+pub mod day19;
 pub mod util;
 
 use std::io::{self, Read};
@@ -51,6 +52,7 @@ Usage:
   advent-2017 dance <repetitions> [<input>]
   advent-2017 spinlock [<input>]
   advent-2017 duet [<input>]
+  advent-2017 route [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -88,6 +90,7 @@ struct Args {
     cmd_dance: bool,
     cmd_spinlock: bool,
     cmd_duet: bool,
+    cmd_route: bool,
 }
 
 impl Args {
@@ -251,5 +254,9 @@ fn main() {
             return;
         }
         println!("Could not parse input");
+    } else if args.cmd_route {
+        let input = args.get_input();
+        let diagram = day19::Diagram::parse(&input);
+        println!("{}", diagram.navigate());
     }
 }
