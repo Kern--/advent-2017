@@ -24,6 +24,7 @@ pub mod day16;
 pub mod day17;
 pub mod day18;
 pub mod day19;
+pub mod day20;
 pub mod util;
 
 use std::io::{self, Read};
@@ -53,6 +54,7 @@ Usage:
   advent-2017 spinlock [<input>]
   advent-2017 duet [<input>]
   advent-2017 route [<input>]
+  advent-2017 particles [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -91,6 +93,7 @@ struct Args {
     cmd_spinlock: bool,
     cmd_duet: bool,
     cmd_route: bool,
+    cmd_particles: bool,
 }
 
 impl Args {
@@ -259,5 +262,8 @@ fn main() {
         let diagram = day19::Diagram::parse(&input);
         let (result, steps) = diagram.navigate();
         println!("result: {}, steps: {}", result, steps);
+    } else if args.cmd_particles {
+        let input = args.get_input();
+        println!("without collision: {}, remaining after collision: {}", day20::simulate(&input), day20::simulate_with_collision(&input));
     }
 }
