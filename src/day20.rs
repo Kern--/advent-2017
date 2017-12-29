@@ -112,7 +112,7 @@ pub mod test {
     #[test]
     fn test_parse() {
         let input = "p=<3,0,0>, v=<2,0,0>, a=<-1,0,0>";
-        assert_eq!(Particle::parse(input), Some(Particle {position: [3,0,0], velocity: [2,0, 0], acceleration: [-1,0,0]}));
+        assert_eq!(Particle::parse(input, 1), Some(Particle {id:1, position: [3,0,0], velocity: [2,0, 0], acceleration: [-1,0,0]}));
     }
 
     #[test]
