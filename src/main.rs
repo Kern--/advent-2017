@@ -1,3 +1,6 @@
+#![feature(try_from)]
+
+
 #[macro_use]
 extern crate serde_derive;
 extern crate docopt;
@@ -25,9 +28,12 @@ pub mod day17;
 pub mod day18;
 pub mod day19;
 pub mod day20;
+pub mod day21;
 pub mod util;
 
 use std::io::{self, Read};
+use std::convert::TryFrom;
+use std::error::Error;
 use docopt::Docopt;
 
 const USAGE: &'static str = "
@@ -55,6 +61,7 @@ Usage:
   advent-2017 duet [<input>]
   advent-2017 route [<input>]
   advent-2017 particles [<input>]
+  advent-2017 enhance <trials> [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -94,6 +101,7 @@ struct Args {
     cmd_duet: bool,
     cmd_route: bool,
     cmd_particles: bool,
+    cmd_enhance: bool,
 }
 
 impl Args {
@@ -265,5 +273,23 @@ fn main() {
     } else if args.cmd_particles {
         let input = args.get_input();
         println!("without collision: {}, remaining after collision: {}", day20::simulate(&input), day20::simulate_with_collision(&input));
+    } else if args.cmd_enhance {
+        let input = args.get_input();
+        let mut matrix = day21::matrix::Matrix::try_from(".#./..#/###").unwrap();
+        let rulebook = day21::rulebook::RuleBook::try_from(input.as_str());
+        let rounds = args.arg_trials.unwrap();
+        match rulebook {
+            Ok(rulebook) => {
+                for _ in 0..rounds {
+                    let enhanced_matrix = rulebook.enhance(matrix);
+                    match enhanced_matrix {
+                        Err(error) => { println!("{}", error.description()); return; },
+                        Ok(enhanced_matrix) => matrix = enhanced_matrix
+                    };
+                }
+                println!("{}", matrix.num_on_pixels());
+            },
+            Err(error) => println!("{}", error.description())
+        }
     }
 }
