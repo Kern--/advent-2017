@@ -29,6 +29,7 @@ pub mod day18;
 pub mod day19;
 pub mod day20;
 pub mod day21;
+pub mod day22;
 pub mod util;
 
 use std::io::{self, Read};
@@ -62,6 +63,7 @@ Usage:
   advent-2017 route [<input>]
   advent-2017 particles [<input>]
   advent-2017 enhance <trials> [<input>]
+  advent-2017 virus <trials> [<input>]
 ";
 
 #[derive(Debug, Deserialize)]
@@ -102,6 +104,7 @@ struct Args {
     cmd_route: bool,
     cmd_particles: bool,
     cmd_enhance: bool,
+    cmd_virus: bool,
 }
 
 impl Args {
@@ -290,6 +293,19 @@ fn main() {
                 println!("{}", matrix.num_on_pixels());
             },
             Err(error) => println!("{}", error.description())
+        }
+    } else if args.cmd_virus {
+        let input = args.get_input();
+        let grid = day22::Grid::try_from(&input);
+        match grid {
+            Ok(grid) => {
+                let bursts = args.arg_trials.unwrap_or(10000) as usize;
+                let mut virus = day22::Virus { grid };
+                println!("{}", virus.run(bursts));
+            },
+            Err(error) => {
+                println!("error parsing grid: {}", error.description());
+            }
         }
     }
 }
