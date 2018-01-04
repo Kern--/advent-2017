@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::HashMap;
 use std::error::Error;
 use std::fmt::{self, Display, Formatter};
 use std::convert::TryFrom;
@@ -25,21 +25,44 @@ impl <'a> Error for GridParseError<'a> {
     }
 }
 
+
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub enum NodeState {
+    Clean,
+    Infected,
+    Weakend,
+    Flagged
+}
+
 /// A grid of compute clusters which contains a set of infected nodes
 pub struct Grid {
-    infected_nodes: HashSet<(i64, i64)>
+    nodes: HashMap<(i64, i64), NodeState>,
+    resistant: bool
 }
 
 impl Grid {
     /// Updates the grid at (x, y)
-    /// returns `true` if the cell has become infected
-    pub fn update(&mut self, x: i64, y: i64) -> bool {
-        if self.infected_nodes.contains(&(x, y)) {
-            self.infected_nodes.remove(&(x, y));
-            return false;
-        }
-        self.infected_nodes.insert((x, y));
-        true
+    /// returns (old_state, new_state)
+    pub fn update(&mut self, x: i64, y: i64) -> (NodeState, NodeState) {
+        let state = self.nodes.entry((x, y)).or_insert(NodeState::Clean);
+        // Update state based on simple or resistance of the grid
+        let new_state = if self.resistant {
+            match *state {
+                NodeState::Clean => NodeState::Weakend,
+                NodeState::Infected => NodeState::Flagged,
+                NodeState::Weakend => NodeState::Infected,
+                NodeState::Flagged => NodeState::Clean
+            }
+        } else {
+            match *state {
+                NodeState::Clean => NodeState::Infected,
+                _ => NodeState::Clean,
+            }
+        };
+        // Update the state and return (old_state, new_state)
+        let old_state = (*state).clone();
+        *state = new_state.clone();
+        (old_state, new_state)
     }
 }
 
@@ -63,7 +86,7 @@ impl <'a> TryFrom<&'a str> for Grid {
             Ok(infected_nodes)
         }
 
-        let mut infected_nodes = HashSet::new();
+        let mut infected_nodes = HashMap::new();
         let rows = input.split("\n").collect::<Vec<&'a str>>();
         let row_count = rows.len() as i64;
         // The distance to offset the column such that 0 is centered
@@ -75,9 +98,9 @@ impl <'a> TryFrom<&'a str> for Grid {
             .flat_map(|rows| rows.into_iter())
             .flat_map(|infected_nodes| infected_nodes.into_iter());
         for (x, y) in parsed_nodes {
-            infected_nodes.insert((x, y));
+            infected_nodes.insert((x, y), NodeState::Infected);
         }
-        Ok(Grid {infected_nodes})
+        Ok(Grid {nodes: infected_nodes, resistant: false})
     }
 }
 
@@ -107,6 +130,15 @@ impl Direction {
         }
     }
 
+    pub fn reverse(&self) -> Direction {
+        match *self {
+            Direction::Up => Direction::Down,
+            Direction::Left => Direction::Right,
+            Direction::Down => Direction::Up,
+            Direction::Right => Direction::Left
+        }
+    }
+
     fn step(&self, x: i64, y: i64) -> (i64, i64) {
         match *self {
             Direction::Up => (x, y + 1),
@@ -123,19 +155,28 @@ pub struct Virus {
 }
 
 impl Virus {
+    pub fn new(mut grid: Grid, resistant: bool) -> Virus {
+        grid.resistant = resistant;
+        Virus {grid}
+    }
+
     pub fn run(&mut self, bursts: usize) -> u64 {
         let mut infection_count = 0;
         let mut direction = Direction::Up;
         let mut x = 0i64;
         let mut y = 0i64;
         for _ in 0..bursts {
-            let became_infected = self.grid.update(x, y);
-            if became_infected {
+            let (old_state, new_state) = self.grid.update(x, y);
+            if new_state == NodeState::Infected {
                 infection_count += 1;
-                direction = direction.turn_left();
-            } else {
-                direction = direction.turn_right();
             }
+            direction = match old_state {
+                NodeState::Clean => direction.turn_left(),
+                NodeState::Weakend => direction,
+                NodeState::Infected => direction.turn_right(),
+                NodeState::Flagged => direction.reverse()
+            };
+            
             let (a, b) = direction.step(x, y);
             x = a;
             y = b;
@@ -152,30 +193,39 @@ mod test {
     fn test_parse_grid() {
         let input = "#..\n.#.\n.##";
         let grid = Grid::try_from(input).unwrap();
-        assert_eq!(grid.infected_nodes.len(), 4);
-        assert!(grid.infected_nodes.contains(&(-1, 1)), "Grid did not contain (-1, 1)");
-        assert!(grid.infected_nodes.contains(&(0, 0)), "Grid did not contain (0, 0)");
-        assert!(grid.infected_nodes.contains(&(0, -1)), "Grid did not contain (0, -1)");
-        assert!(grid.infected_nodes.contains(&(1, -1)), "Grid did not contain (1, -1)");
+        assert_eq!(grid.nodes.len(), 4);
+        assert_eq!(grid.nodes.get(&(-1, 1)), Some(&NodeState::Infected), "Grid did not contain (-1, 1)");
+        assert_eq!(grid.nodes.get(&(0, 0)), Some(&NodeState::Infected), "Grid did not contain (0, 0)");
+        assert_eq!(grid.nodes.get(&(0, -1)), Some(&NodeState::Infected), "Grid did not contain (0, -1)");
+        assert_eq!(grid.nodes.get(&(1, -1)), Some(&NodeState::Infected), "Grid did not contain (1, -1)");
     }
 
     #[test]
     fn test_update_grid() {
         let input = "...\n.#.\n...";
         let mut grid = Grid::try_from(input).unwrap();
-        assert!(grid.infected_nodes.contains(&(0, 0)), "Grid did not contain (0, 0) before cleaning");
-        assert!(!grid.update(0, 0), "Grid did not clean (0, 0) during clean");
-        assert!(!grid.infected_nodes.contains(&(0, 0)), "Grid contained (0, 0) after cleaning");
-        assert!(grid.update(0, 0), "Grid did not infect (0, 0) during infection");
-        assert!(grid.infected_nodes.contains(&(0, 0)), "Grid did not contain (0, 0) after infection");
+        assert_eq!(grid.nodes.get(&(0, 0)), Some(&NodeState::Infected), "Grid did not contain (0, 0) before cleaning");
+        assert_eq!(grid.update(0, 0), (NodeState::Infected, NodeState::Clean), "Grid did not clean (0, 0) during clean");
+        assert_eq!(grid.nodes.get(&(0, 0)), Some(&NodeState::Clean), "Grid contained (0, 0) after cleaning");
+        assert_eq!(grid.update(0, 0), (NodeState::Clean, NodeState::Infected), "Grid did not infect (0, 0) during infection");
+        assert_eq!(grid.nodes.get(&(0, 0)), Some(&NodeState::Infected), "Grid did not contain (0, 0) after infection");
 
     }
 
     #[test]
-    fn test_virus() {
+    fn test_simple_virus() {
         let input = "..#\n#..\n...";
         let grid = Grid::try_from(input).unwrap();
         let mut virus = Virus { grid };
         assert_eq!(virus.run(10000), 5587);
+    }
+
+    #[test]
+    fn test_resistant_virus() {
+        let input = "..#\n#..\n...";
+        let mut grid = Grid::try_from(input).unwrap();
+        grid.resistant = true;
+        let mut virus = Virus { grid };
+        assert_eq!(virus.run(10000000), 2511944);
     }
 }

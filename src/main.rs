@@ -63,10 +63,10 @@ Usage:
   advent-2017 route [<input>]
   advent-2017 particles [<input>]
   advent-2017 enhance <trials> [<input>]
-  advent-2017 virus <trials> [<input>]
+  advent-2017 virus <trials> <variant> [<input>]
 ";
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 enum Variant {
     Simple,
     Complex
@@ -297,10 +297,11 @@ fn main() {
     } else if args.cmd_virus {
         let input = args.get_input();
         let grid = day22::Grid::try_from(&input);
+        let resistant =  args.arg_variant == Some(Variant::Complex);
         match grid {
             Ok(grid) => {
                 let bursts = args.arg_trials.unwrap_or(10000) as usize;
-                let mut virus = day22::Virus { grid };
+                let mut virus = day22::Virus::new(grid, resistant);
                 println!("{}", virus.run(bursts));
             },
             Err(error) => {
