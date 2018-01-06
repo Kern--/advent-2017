@@ -42,3 +42,23 @@ impl Coprocessor {
         value
     }
 }
+
+/// Calculates the number of non-prime numbers
+/// bettween [b * 100 + 100_000, b * 100 + 117_000]
+/// This is a translation of the input assembly
+pub fn calculate_non_primes(b: usize) -> usize {
+    let mut current = b * 100 + 100_000;
+    let end = current + 17_000;
+    let mut result = 0;
+    while current <= end {
+        for d in 2..current - 1 {
+            if current % d == 0 {
+                // not prime. 
+                result += 1;
+                break;
+            }
+        }
+        current += 17; 
+    }
+    result
+}

@@ -67,7 +67,7 @@ Usage:
   advent-2017 particles [<input>]
   advent-2017 enhance <trials> [<input>]
   advent-2017 virus <trials> <variant> [<input>]
-  advent-2017 coprocessor [<input>]
+  advent-2017 coprocessor <variant> [<input>]
 ";
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -315,11 +315,24 @@ fn main() {
         }
     } else if args.cmd_coprocessor {
         let input = args.get_input();
-        let mut coprocessor = day23::Coprocessor::new(&input);
-        if let Some(ref mut coprocessor) = coprocessor {
-            println!("{}", coprocessor.execute());
-            return;
+        match args.arg_variant.unwrap_or(Variant::Simple) {
+            Variant::Simple => {
+                let mut coprocessor = day23::Coprocessor::new(&input);
+                if let Some(ref mut coprocessor) = coprocessor {
+                    println!("{}", coprocessor.execute());
+                    return;
+                }
+                println!("Could not parse instructions");
+            },
+            Variant::Complex => {
+                let parsed = input.parse::<usize>();
+                if let Ok(parsed) = parsed {
+                    println!("{}", day23::calculate_non_primes(parsed));
+                    return;
+                }
+                println!("Input must be a positive integer");
+            }
         }
-        println!("Could not parse instructions");
+        
     }
 }
