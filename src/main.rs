@@ -69,7 +69,7 @@ Usage:
   advent-2017 enhance <trials> [<input>]
   advent-2017 virus <trials> <variant> [<input>]
   advent-2017 coprocessor <variant> [<input>]
-  advent-2017 bridge [<input>]
+  advent-2017 bridge <variant> [<input>]
 ";
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -338,8 +338,11 @@ fn main() {
         }   
     } else if args.cmd_bridge {
         let input = args.get_input();
-        let strongest_bridge = day24::compute_strongest_bridge(&input);
-        match strongest_bridge {
+        let bridge = match args.arg_variant.unwrap_or(Variant::Simple) {
+            Variant::Simple => day24::compute_strongest_bridge(&input),
+            Variant::Complex => day24::compute_longest_bridge(&input)
+        };
+        match bridge {
             Ok(strength) => println!("{}", strength),
             Err(error) => println!("{}", error)
         }

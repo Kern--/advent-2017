@@ -71,10 +71,29 @@ fn search_for_strongest_bridge(nodes: &Vec<Node>, seen: HashSet<Node>, current_s
             search_for_strongest_bridge(nodes, new_seen, new_strength, new_constraint)})
         // Choose the maximum strength of all bridges that can be made by extending the current one
         .max_by(|a, b| a.cmp(b))
-        // If no bridges can be made by extension, the max is the current strength;
+        // If no bridges can be made by extension, the max is the current strength
         .unwrap_or(current_strength)
 }
 
+fn search_for_longest_bridge(nodes: &Vec<Node>, seen: HashSet<Node>, current_strength: u32, current_length: u32, constraint: u32) -> (u32, u32) {
+    nodes.iter()
+        // Select nodes that can be connected to the current nodes
+        .filter(|node| node.left == constraint || node.right == constraint)
+        // Select nodes which haven't already been seen
+        .filter(|node| !seen.contains(&node))
+        // Calculate the max-length of all extended bridges that can be made from the current bridge extended by one node
+        .map(|sub_node| {
+            let mut new_seen: HashSet<Node> = seen.iter().cloned().collect();
+            new_seen.insert(sub_node.clone());
+            let new_strength = current_strength + sub_node.strength();
+            let new_constraint = if sub_node.left == constraint { sub_node.right } else { sub_node.left };
+            search_for_longest_bridge(nodes, new_seen, new_strength, current_length + 1, new_constraint)})
+        // Choose the maximum length of all bridges that can be made by extending the current one
+        //  If any two have the same length, choose the maximum by strength
+        .max_by(|&(len_a, str_a), &(len_b, str_b)| if len_a != len_b { len_a.cmp(&len_b) } else { str_a.cmp(&str_b) })
+        // If no bridges can be made by extension, the max is the current length
+        .unwrap_or((current_length, current_strength))
+}
 /// Computes the strength of the strongest bridge that can be made
 ///  from the input string.
 pub fn compute_strongest_bridge(input: &str) -> Result<u32, NodeParseError> {
@@ -86,6 +105,20 @@ pub fn compute_strongest_bridge(input: &str) -> Result<u32, NodeParseError> {
     }
     // Call a recursive method to find the strongest
     Ok(search_for_strongest_bridge(&nodes, HashSet::new(), 0, 0))
+}
+
+/// Computes the length of the longest bridge that can be made
+///  from the input string.
+pub fn compute_longest_bridge(input: &str) -> Result<u32, NodeParseError> {
+    // Parse the nodes
+    let mut nodes = input.split("\n").map(Node::try_from).collect::<Result<Vec<Node>, NodeParseError>>()?;
+    // Give them IDs so that if 2 nodes have the same left/right, they're distinguishable
+    for (id, node) in nodes.iter_mut().enumerate() {
+        node.id = id;
+    }
+    // Call a recursive method to find the longest
+    let (_, strength) = search_for_longest_bridge(&nodes, HashSet::new(), 0, 0, 0);
+    Ok(strength)
 }
 
 #[cfg(test)]
