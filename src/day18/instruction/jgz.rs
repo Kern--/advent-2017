@@ -1,6 +1,6 @@
 use super::{InstructionType, Instruction};
-use super::super::environment::Environment;
-use super::super::value::Value;
+use super::super::Environment;
+use super::super::Value;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Jgz {
@@ -31,7 +31,7 @@ pub fn parse(reg: &str, val: &str) -> Box<Jgz> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use super::super::super::environment::SpecialRegister;
+    use processor::SpecialRegister;
 
     #[test]
     fn test_parse() {

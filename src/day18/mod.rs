@@ -1,8 +1,7 @@
-mod environment;
 mod instruction;
-mod value;
 
-use self::environment::Environment;
+use super::processor::{Environment, SpecialRegister};
+use super::processor::Value;
 use self::instruction::{Instruction, InstructionType};
 
 pub struct SoundInterpreter {

@@ -1,4 +1,4 @@
-use super::environment::Environment;
+use super::Environment;
 
 mod snd;
 mod set;

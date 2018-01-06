@@ -1,6 +1,6 @@
 use super::{InstructionType, Instruction};
-use super::super::environment::Environment;
-use super::super::value::Value;
+use super::super::Environment;
+use super::super::Value;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Set {

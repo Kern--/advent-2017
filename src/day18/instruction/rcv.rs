@@ -1,5 +1,5 @@
 use super::{InstructionType, Instruction};
-use super::super::environment::{Environment, SpecialRegister};
+use super::super::{Environment, SpecialRegister};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Rcv {

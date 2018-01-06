@@ -18,7 +18,7 @@ impl Value {
 #[cfg(test)]
 mod test {
     use super::*;
-    use day18::environment::Environment;
+    use processor::Environment;
 
     #[test]
     fn test_parse() {
