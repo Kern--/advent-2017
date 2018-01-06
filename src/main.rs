@@ -32,6 +32,7 @@ pub mod day19;
 pub mod day20;
 pub mod day21;
 pub mod day22;
+pub mod day23;
 pub mod util;
 
 use std::io::{self, Read};
@@ -66,6 +67,7 @@ Usage:
   advent-2017 particles [<input>]
   advent-2017 enhance <trials> [<input>]
   advent-2017 virus <trials> <variant> [<input>]
+  advent-2017 coprocessor [<input>]
 ";
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -107,6 +109,7 @@ struct Args {
     cmd_particles: bool,
     cmd_enhance: bool,
     cmd_virus: bool,
+    cmd_coprocessor: bool,
 }
 
 impl Args {
@@ -310,5 +313,13 @@ fn main() {
                 println!("error parsing grid: {}", error.description());
             }
         }
+    } else if args.cmd_coprocessor {
+        let input = args.get_input();
+        let mut coprocessor = day23::Coprocessor::new(&input);
+        if let Some(ref mut coprocessor) = coprocessor {
+            println!("{}", coprocessor.execute());
+            return;
+        }
+        println!("Could not parse instructions");
     }
 }
