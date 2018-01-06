@@ -1,7 +1,6 @@
 mod instruction;
 
-use super::processor::{Environment, SpecialRegister};
-use super::processor::Value;
+use super::processor::{Environment, Value};
 use self::instruction::{Instruction, InstructionType};
 
 pub struct SoundInterpreter {

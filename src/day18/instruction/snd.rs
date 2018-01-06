@@ -1,6 +1,5 @@
-use super::{InstructionType, Instruction};
-use super::super::{Environment, SpecialRegister};
-use super::super::Value;
+use super::{InstructionType, Instruction, RCV_REGISTER};
+use super::super::{Environment, Value};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Snd {
@@ -14,7 +13,7 @@ impl Instruction for Snd {
 
     fn execute(&self, environment: &mut Environment) -> Option<i64> {
         let value = environment.get_value(&self.sound);
-        environment.set(&SpecialRegister::SND.get_name(), value);
+        environment.set(&RCV_REGISTER, value);
         Some(value)
     }
 }
@@ -39,7 +38,7 @@ mod test {
         let mut environment = Environment::new();
         let instruction = Snd {sound:  Value::Literal(8)};
         instruction.execute(&mut environment);
-        assert_eq!(environment.get(&SpecialRegister::SND.get_name()),  8);
+        assert_eq!(environment.get(&RCV_REGISTER),  8);
     }
 
     #[test]
@@ -49,6 +48,6 @@ mod test {
         let instruction = Snd {sound: Value::Register("a".into())};
         instruction.execute(&mut environment);
         assert_eq!(environment.get(&"a"), 2);
-        assert_eq!(environment.get(&SpecialRegister::SND.get_name()),  2);
+        assert_eq!(environment.get(&RCV_REGISTER),  2);
     }
 }

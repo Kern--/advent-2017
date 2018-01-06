@@ -3,21 +3,19 @@ use super::value::Value;
 
 pub struct Environment {
     state: HashMap<String, i64>
+
 }
 
 /// A register that has special meaning
 pub enum SpecialRegister {
     /// The program counter
     PC,
-    /// The sound register (where sounds are sent and received)
-    SND
 }
 
 impl SpecialRegister {
     pub fn get_name(&self) -> &'static str {
         match *self {
             SpecialRegister::PC => "pc",
-            SpecialRegister::SND => "snd"
         }
     }
 }

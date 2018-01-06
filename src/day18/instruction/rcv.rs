@@ -1,5 +1,5 @@
-use super::{InstructionType, Instruction};
-use super::super::{Environment, SpecialRegister};
+use super::{InstructionType, Instruction, RCV_REGISTER};
+use super::super::{Environment};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Rcv {
@@ -14,7 +14,7 @@ impl Instruction for Rcv {
     fn execute(&self, environment: &mut Environment) -> Option<i64> {
         let value = environment.get(&self.register);
         if value != 0 {
-            let snd = environment.get(&SpecialRegister::SND.get_name());
+            let snd = environment.get(&RCV_REGISTER);
             environment.set(&self.register, snd);
             return Some(snd);
         }
@@ -39,7 +39,7 @@ mod test {
     #[test]
     fn test_execute() {
         let mut environment = Environment::new();
-        environment.set(&SpecialRegister::SND.get_name(), 10);
+        environment.set(&RCV_REGISTER, 10);
         let instruction = Rcv {register: "a".into()};
         instruction.execute(&mut environment);
         assert_eq!(environment.get(&"a"), 0);
