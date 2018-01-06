@@ -33,6 +33,7 @@ pub mod day20;
 pub mod day21;
 pub mod day22;
 pub mod day23;
+pub mod day24;
 pub mod util;
 
 use std::io::{self, Read};
@@ -68,6 +69,7 @@ Usage:
   advent-2017 enhance <trials> [<input>]
   advent-2017 virus <trials> <variant> [<input>]
   advent-2017 coprocessor <variant> [<input>]
+  advent-2017 bridge [<input>]
 ";
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -110,6 +112,7 @@ struct Args {
     cmd_enhance: bool,
     cmd_virus: bool,
     cmd_coprocessor: bool,
+    cmd_bridge: bool,
 }
 
 impl Args {
@@ -332,7 +335,13 @@ fn main() {
                 }
                 println!("Input must be a positive integer");
             }
+        }   
+    } else if args.cmd_bridge {
+        let input = args.get_input();
+        let strongest_bridge = day24::compute_strongest_bridge(&input);
+        match strongest_bridge {
+            Ok(strength) => println!("{}", strength),
+            Err(error) => println!("{}", error)
         }
-        
     }
 }
