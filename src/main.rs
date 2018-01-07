@@ -34,6 +34,7 @@ pub mod day21;
 pub mod day22;
 pub mod day23;
 pub mod day24;
+pub mod day25;
 pub mod util;
 
 use std::io::{self, Read};
@@ -70,6 +71,7 @@ Usage:
   advent-2017 virus <trials> <variant> [<input>]
   advent-2017 coprocessor <variant> [<input>]
   advent-2017 bridge <variant> [<input>]
+  advent-2017 turing [<input>]
 ";
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -113,6 +115,7 @@ struct Args {
     cmd_virus: bool,
     cmd_coprocessor: bool,
     cmd_bridge: bool,
+    cmd_turing: bool,
 }
 
 impl Args {
@@ -270,7 +273,7 @@ fn main() {
         }
     } else if args.cmd_duet {
         let input = args.get_input();
-        let interpreter = day18::SoundInterpreter::new(&input);
+        let interpreter = day18::Interpreter::new(&input);
         if let Some(mut interpreter) = interpreter {
             println!("{}", interpreter.execute());
             return;
@@ -344,6 +347,13 @@ fn main() {
         };
         match bridge {
             Ok(strength) => println!("{}", strength),
+            Err(error) => println!("{}", error)
+        }
+    } else if args.cmd_turing {
+        let input = args.get_input();
+        let mut turing_machine = day25::TuringMachine::try_from(&input);
+        match turing_machine {
+            Ok(ref mut turing_machine) => println!("{}", turing_machine.run()),
             Err(error) => println!("{}", error)
         }
     }

@@ -8,10 +8,9 @@ mod rem;
 mod rcv;
 mod jgz;
 
-static RCV_REGISTER: &str = "rcv";
-
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub enum InstructionType {
+    Halt,
     Snd,
     Set,
     Add,

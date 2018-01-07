@@ -1,9 +1,14 @@
 use std::collections::HashMap;
 use super::value::Value;
+use std::rc::Rc;
+use std::cell::RefCell;
+use std::collections::VecDeque;
 
+#[derive(Debug, PartialEq)]
 pub struct Environment {
-    state: HashMap<String, i64>
-
+    state: HashMap<String, i64>,
+    linked_env: Option<Rc<RefCell<Environment>>>,
+    rcv: VecDeque<i64>,
 }
 
 /// A register that has special meaning
@@ -23,7 +28,12 @@ impl SpecialRegister {
 /// A store of registers and their values
 impl Environment {
     pub fn new() -> Environment {
-        Environment { state: HashMap::new() }
+        Environment { state: HashMap::new(), linked_env: None, rcv: VecDeque::new() }
+    }
+
+    /// Links the current environment to another to enable sending/receiving
+    pub fn link(&mut self, other: Rc<RefCell<Environment>>) {
+        self.linked_env = Some(other);
     }
 
     /// Gets the current value of a register
@@ -67,5 +77,18 @@ impl Environment {
         let pc = SpecialRegister::PC.get_name();
         let old_value = self.get(&pc);
         self.set(&pc, old_value + offset - 1);
+    }
+
+    /// Sends `value` to a linked environment.
+    /// Does nothign if no environment has been linked
+    pub fn send(&mut self, value: i64) {
+        if let Some(ref link) = self.linked_env {
+            link.borrow_mut().rcv.push_back(value);
+        }
+    }
+
+    /// Receives a value sent from a linked environment
+    pub fn receive(&mut self) -> Option<i64> {
+        return self.rcv.pop_front()
     }
 }
